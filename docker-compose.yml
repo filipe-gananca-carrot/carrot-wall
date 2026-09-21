@@ -8,7 +8,11 @@ services:
     environment:
       ADMIN_PIN: ${ADMIN_PIN:-0000}
     volumes:
+      - ./apps/api:/api
+      - api-m2:/root/.m2
       - api-data:/data
+    stdin_open: true
+    tty: true
 
   web:
     build:
@@ -16,8 +20,13 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "3010:4200"
+    volumes:
+      - ./apps/web:/web
+      - web-node-modules:/web/node_modules
     depends_on:
       - api
 
 volumes:
   api-data:
+  api-m2:
+  web-node-modules:

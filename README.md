@@ -15,6 +15,17 @@ cd apps/web && npm install && npm start   # web → http://localhost:4200
 The database is an H2 file under `apps/api/data/`, created and seeded on first boot.
 Nothing to provision.
 
+### Run it without installing Java/Maven/Node
+
+`docker-compose.yml` runs the same dev-mode processes (`quarkus:dev`, `ng serve`)
+inside containers, with your source bind-mounted for hot reload. Nothing touches
+your machine but Docker.
+
+```bash
+docker compose up --build   # API → http://localhost:8010, web → http://localhost:3010
+docker compose down         # stop (add -v to also wipe the H2 db and dependency caches)
+```
+
 ## Test it
 
 ```bash

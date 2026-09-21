@@ -1,14 +1,6 @@
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM maven:3.9-eclipse-temurin-21
 WORKDIR /api
 COPY . ./
-RUN mvn -B package -DskipTests
-
-FROM eclipse-temurin:21-jre-alpine
-WORKDIR /deployments
-COPY --from=build /api/target/quarkus-app/lib/ ./lib/
-COPY --from=build /api/target/quarkus-app/*.jar ./
-COPY --from=build /api/target/quarkus-app/app/ ./app/
-COPY --from=build /api/target/quarkus-app/quarkus/ ./quarkus/
 EXPOSE 8080
 ENV WALL_DB_PATH=/data/carrot-wall
-CMD ["java", "-jar", "quarkus-run.jar"]
+CMD ["mvn", "-q", "quarkus:dev", "-Dquarkus.http.host=0.0.0.0", "-DskipTests"]
