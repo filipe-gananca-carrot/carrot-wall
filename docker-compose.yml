@@ -26,7 +26,34 @@ services:
     depends_on:
       - api
 
+  # Playwright ships no Alpine browser builds, so the e2e suite cannot run in the `web`
+  # container. This uses Microsoft's official image (Ubuntu, browsers preinstalled) and drives
+  # the already-running `web` service over the compose network. Profile-gated, so a plain
+  # `docker compose up` never starts it: run with `docker compose run --rm e2e`.
+  e2e:
+    profiles: ["e2e"]
+    image: mcr.microsoft.com/playwright:v1.63.0-noble
+    working_dir: /web
+    # Shares the web container's network stack so the dev server is reached as
+    # `localhost:4200`. Reaching it as `web:4200` instead returns 403: Angular 22's dev server
+    # is Vite-based and Vite rejects a Host header it does not recognise. The alternative,
+    # `ng serve --allowed-hosts`, turns that check off altogether and needs the web image
+    # rebuilt; this needs neither.
+    network_mode: "service:web"
+    environment:
+      E2E_BASE_URL: http://localhost:4200
+    volumes:
+      - ./apps/web:/web
+      # Its own volume, not web's: that one is built by node:22-alpine against musl, and this
+      # image is glibc — sharing it breaks any native binary in the tree.
+      - e2e-node-modules:/web/node_modules
+    depends_on:
+      - web
+      - api
+    command: sh -c "npm install --no-audit --no-fund && npx playwright test"
+
 volumes:
   api-data:
   api-m2:
   web-node-modules:
+  e2e-node-modules:

@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { WALL_URL } from './base-url';
+
 test.describe('/tv', () => {
   test('submitting a post makes it appear on /tv within one poll and page-turn cycle', async ({
     page,
@@ -15,7 +17,7 @@ test.describe('/tv', () => {
     await page.goto('/post');
     await page.getByLabel('Mensagem').fill(message);
     await page.getByRole('button', { name: 'Enviar' }).click();
-    await expect(page).toHaveURL(/^http:\/\/localhost:4200\/(\?highlight=\d+)?$/);
+    await expect(page).toHaveURL(WALL_URL);
 
     await page.goto('/tv');
     await expect(page.locator('body')).toContainText(message, { timeout: 20_000 });

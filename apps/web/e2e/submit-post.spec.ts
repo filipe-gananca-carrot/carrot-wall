@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { BASE_URL, WALL_URL } from './base-url';
+
 test.describe('/post', () => {
   test('loads with the message field focused around the fold', async ({ page }) => {
     await page.goto('/post');
@@ -48,11 +50,11 @@ test.describe('/post', () => {
     // The URL's ?highlight= is cleared the instant the post is found in the loaded list —
     // asserting on it is a race against that same lookup, so we assert on the visible ring
     // instead, which the app holds open for a full 2s regardless of how fast the param clears.
-    await expect(page).toHaveURL(/^http:\/\/localhost:4200\/(\?highlight=\d+)?$/);
+    await expect(page).toHaveURL(WALL_URL);
     const card = page.locator('app-post-card', { hasText: message });
     await expect(card.locator('.post-card--highlighted')).toBeVisible();
 
-    await expect(page).toHaveURL('http://localhost:4200/', { timeout: 3000 });
+    await expect(page).toHaveURL(`${BASE_URL}/`, { timeout: 3000 });
     await expect(card.locator('.post-card--highlighted')).toHaveCount(0, { timeout: 3000 });
     await expect(card).toContainText(message);
   });
