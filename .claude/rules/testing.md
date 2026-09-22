@@ -18,7 +18,7 @@ On this machine the workflow is Docker (no JDK 21 on the host).
 - API tests: `docker compose run --rm --no-deps -T api sh -c 'cp -r /api /tmp/build && cd /tmp/build && mvn -B test'`
   (60 tests) — **not** `docker compose exec api mvn test`, which writes to the bind-mounted
   `target/` and can wedge the running `quarkus:dev` server.
-- E2E: `docker compose run --rm e2e` (7 tests). It drives the already-running `web` service and
+- E2E: `docker compose run --rm e2e`. It drives the already-running `web` service and
   **writes to the dev database** — every run leaves real posts on the wall. Hide them from
   `/admin`, or `docker compose down -v` to reset.
 
